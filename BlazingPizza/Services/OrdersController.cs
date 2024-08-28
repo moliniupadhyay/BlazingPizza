@@ -15,25 +15,17 @@ public class OrdersController : Controller
     }
      
      [HttpGet]
-public async Task<ActionResult<List<OrderWithStatus>>> GetOrders()
-{
-    try
+       public async Task<ActionResult<List<OrderWithStatus>>> GetOrders()
     {
         var orders = await _db.Orders
-            .Include(o => o.Pizzas).ThenInclude(p => p.Special)
-            .Include(o => o.Pizzas).ThenInclude(p => p.Toppings).ThenInclude(t => t.Topping)
-            .OrderByDescending(o => o.CreatedTime)
-            .ToListAsync();
+ 	    .Include(o => o.Pizzas).ThenInclude(p => p.Special)
+ 	    .Include(o => o.Pizzas).ThenInclude(p => p.Toppings).ThenInclude(t => t.Topping)
+ 	    .OrderByDescending(o => o.CreatedTime)
+ 	    .ToListAsync();
 
         return orders.Select(o => OrderWithStatus.FromOrder(o)).ToList();
     }
-    catch (Exception ex)
-    {
-        // Log the exception
-        Console.WriteLine($"Error fetching orders: {ex.Message}");
-        return StatusCode(500, "Internal server error");
-    }
-}
+
     [HttpPost]
     public async Task<ActionResult<int>> PlaceOrder(Order order)
     {
@@ -53,4 +45,22 @@ public async Task<ActionResult<List<OrderWithStatus>>> GetOrders()
 
         return order.OrderId;
     }
+
+[HttpGet("{orderId}")]
+public async Task<ActionResult<OrderWithStatus>> GetOrderWithStatus(int orderId)
+{
+    var order = await _db.Orders
+        .Where(o => o.OrderId == orderId)
+        .Include(o => o.Pizzas).ThenInclude(p => p.Special)
+        .Include(o => o.Pizzas).ThenInclude(p => p.Toppings).ThenInclude(t => t.Topping)
+        .SingleOrDefaultAsync();
+
+    if (order == null)
+    {
+        return NotFound();
+    }
+
+    return OrderWithStatus.FromOrder(order);
+}
+
 }
