@@ -2,7 +2,6 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @using BlazingPizza.Services
-@using Microsoft.JSInterop
 @inject OrderState OrderState
 @inject IJSRuntime JavaScript
 
@@ -50,7 +49,7 @@
                   <button type="button" class="close text-danger" aria-label="Close"
                    @onclick="@(async () => await RemovePizzaConfirmation(configuredPizza))">
                   <span aria-hidden="true">&times;</span>
-</button>
+                  </button>
               </div>
             }
         </div>
@@ -99,4 +98,5 @@ async Task RemovePizzaConfirmation(Pizza removePizza)
 }
 
 }
+
 
